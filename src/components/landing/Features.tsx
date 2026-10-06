@@ -69,7 +69,7 @@ const features = [
 export default function Features() {
   return (
     <section id="features" className="mx-auto max-w-7xl scroll-mt-16 px-4 py-20 sm:px-6">
-      <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+      <p className="text-sm font-semibold uppercase tracking-wider text-primary">
         Platform features
       </p>
       <h2 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
@@ -79,18 +79,18 @@ export default function Features() {
         {features.map(({ icon: Icon, title, points, wide }) => (
           <div
             key={title}
-            className={`group rounded-2xl border border-foreground/10 p-6 transition hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/10 ${
+            className={`group rounded-2xl border border-border p-6 transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 ${
               wide ? "md:col-span-2" : ""
             }`}
           >
-            <span className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <span className="inline-flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
               <Icon size={22} />
             </span>
             <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-            <ul className="mt-3 space-y-1.5 text-sm text-foreground/65">
+            <ul className="mt-3 space-y-1.5 text-sm text-muted">
               {points.map((point) => (
                 <li key={point} className="flex gap-2">
-                  <span className="mt-2 size-1 shrink-0 rounded-full bg-accent" />
+                  <span className="mt-2 size-1 shrink-0 rounded-full bg-primary" />
                   {point}
                 </li>
               ))}

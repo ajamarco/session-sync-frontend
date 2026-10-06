@@ -17,35 +17,35 @@ const rows: { feature: string; values: Cell[] }[] = [
 
 function CellIcon({ value }: { value: Cell }) {
   if (value === "yes") {
-    return <Check size={18} className="mx-auto text-accent" aria-label="Yes" />;
+    return <Check size={18} className="mx-auto text-primary" aria-label="Yes" />;
   }
   if (value === "no") {
     return <X size={18} className="mx-auto text-foreground/30" aria-label="No" />;
   }
-  return <span className="text-xs text-foreground/60">Partial</span>;
+  return <span className="text-xs text-muted">Partial</span>;
 }
 
 export default function Comparison() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-      <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+      <p className="text-sm font-semibold uppercase tracking-wider text-primary">
         Why SessionSync
       </p>
       <h2 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
         Replace a stack of tools with one
       </h2>
-      <div className="mt-12 overflow-x-auto rounded-2xl border border-foreground/10">
+      <div className="mt-12 overflow-x-auto rounded-2xl border border-border">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="border-b border-foreground/10">
-              <th className="p-4 text-left font-medium text-foreground/60">
+            <tr className="border-b border-border">
+              <th className="p-4 text-left font-medium text-muted">
                 Feature
               </th>
               {competitors.map((name, i) => (
                 <th
                   key={name}
                   className={`p-4 text-center font-semibold ${
-                    i === 0 ? "bg-accent-soft text-accent" : ""
+                    i === 0 ? "bg-primary-soft text-primary" : ""
                   }`}
                 >
                   {name}
@@ -57,13 +57,13 @@ export default function Comparison() {
             {rows.map(({ feature, values }) => (
               <tr
                 key={feature}
-                className="border-b border-foreground/10 last:border-0"
+                className="border-b border-border last:border-0"
               >
                 <td className="p-4">{feature}</td>
                 {values.map((value, i) => (
                   <td
                     key={competitors[i]}
-                    className={`p-4 text-center ${i === 0 ? "bg-accent-soft/60" : ""}`}
+                    className={`p-4 text-center ${i === 0 ? "bg-primary-soft/60" : ""}`}
                   >
                     <CellIcon value={value} />
                   </td>

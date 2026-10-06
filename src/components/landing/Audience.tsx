@@ -26,7 +26,7 @@ const personas = [
 export default function Audience() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
-      <p className="text-sm font-semibold uppercase tracking-wider text-accent">
+      <p className="text-sm font-semibold uppercase tracking-wider text-primary">
         Who it&apos;s for
       </p>
       <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -36,11 +36,11 @@ export default function Audience() {
         {personas.map(({ icon: Icon, title, text }) => (
           <div
             key={title}
-            className="rounded-2xl bg-accent-soft p-6 transition hover:-translate-y-1"
+            className="rounded-2xl bg-primary-soft p-6 transition hover:-translate-y-1"
           >
-            <Icon size={26} className="text-accent" />
+            <Icon size={26} className="text-primary" />
             <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
-            <p className="mt-1 text-sm text-foreground/65">{text}</p>
+            <p className="mt-1 text-sm text-muted">{text}</p>
           </div>
         ))}
       </div>

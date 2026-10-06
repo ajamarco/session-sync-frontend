@@ -17,7 +17,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
       <nav className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
         {/* Left */}
         <div className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
             <li key={href}>
               <Link
                 href={href}
-                className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
+                className="text-sm font-medium text-muted transition-colors hover:text-foreground"
               >
                 {label}
               </Link>
@@ -68,7 +68,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
           ) : (
             <Link
               href="/login"
-              className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:opacity-90"
+              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               Login / Register
             </Link>
@@ -78,7 +78,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <ul className="border-t border-foreground/10 px-4 py-2 md:hidden">
+        <ul className="border-t border-border px-4 py-2 md:hidden">
           {navLinks.map(({ href, label }) => (
             <li key={href}>
               <Link
