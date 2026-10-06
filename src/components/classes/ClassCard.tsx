@@ -1,4 +1,5 @@
 import { User } from "lucide-react";
+import ClassDetailsButton from "@/components/classes/ClassDetailsButton";
 
 type ClassCardProps = {
   title: string;
@@ -25,12 +26,7 @@ export default function ClassCard({ title, subtitle }: ClassCardProps) {
         >
           Book
         </button>
-        <button
-          type="button"
-          className="text-center text-sm text-muted transition hover:text-foreground"
-        >
-          + details
-        </button>
+        <ClassDetailsButton title={title} subtitle={subtitle} />
       </div>
     </div>
   );

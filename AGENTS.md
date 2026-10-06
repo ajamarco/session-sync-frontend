@@ -48,6 +48,9 @@ Rules:
 - `src/app/page.tsx`: landing page; only composes section components in order (Hero, Problem, Features, HowItWorks, Audience, Pricing, Comparison, CallToAction) followed by `Footer`.
 - `src/components/Navbar.tsx`: sticky top bar with three sections. Left: logo placeholder text "my logo" (real logo TBD). Centre: Dashboard (`/dashboard`) and Classes (`/classes`). Right: lucide `User` avatar plus "Login / Register" (`/login`) or "Logout". Takes an `isLoggedIn` prop (default `false`, **mock only, no real auth yet**; Logout does nothing). Below the `md` breakpoint the centre links collapse into a hamburger menu. It is a Client Component only because of the menu `useState`.
 - `src/components/landing/*.tsx`: one file per landing section, so the layout is easy to reorder or replace. Content (copy, plans, rows) sits in hoisted module-level constant arrays at the top of each file. `#features` and `#pricing` are anchor ids with `scroll-mt-16` to clear the sticky navbar.
+- `src/app/classes/page.tsx`: `/classes` route; only renders `<Classes />`.
+- `src/components/classes/Classes.tsx`: classes page content. `<h1>Classes</h1>` plus a single-column list of `ClassCard`s built from a hoisted **mock** `classes` array (title, subtitle). The container uses `mx-auto w-full max-w-7xl px-4 sm:px-6` so it lines up with the navbar; `w-full` is required because the body is a flex column and `mx-auto` alone would shrink the container to its content.
+- `src/components/classes/ClassCard.tsx`: full-width horizontal card (stacks on mobile). Left: placeholder instructor avatar (same lucide `User` in a `bg-foreground/10` circle as the navbar), then title above subtitle. Right (`sm:w-1/5`): primary "Book" button with a text-style "+ details" button below it. Both buttons are **inert** (no booking/details routes or backend yet).
 - The landing page is a **placeholder**; the final design has not been agreed. Copy not taken from the deck (hero headline, "how it works" steps, "Maria Lopez" mock card) is our own wording.
 
 ## Conventions
@@ -56,7 +59,7 @@ Rules:
 - Keep components mobile-first and responsive (check ~375px width; no horizontal page scroll; wide tables scroll inside an `overflow-x-auto` wrapper). Support light and dark mode through the theme tokens.
 - Match the surrounding code style (double quotes, semicolons, 2-space indent, Tailwind classes inline, no CSS modules).
 - Follow the performance rules in `.agents/skills/vercel-react-best-practices/` (see its `SKILL.md`), e.g. avoid barrel-file imports, hoist static JSX/data, fetch in parallel on the server.
-- Not built yet: `/login`, `/dashboard` and `/classes` routes (links to them 404), authentication, the backend, tests.
+- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, booking and class details, authentication, the backend, tests.
 
 ## Commands (run from `frontend/`)
 - `npm run dev`: dev server at http://localhost:3000
