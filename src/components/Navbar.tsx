@@ -31,7 +31,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           <Link href="/" className="text-lg font-semibold">
-            my logo
+            Session Sync
           </Link>
         </div>
 
