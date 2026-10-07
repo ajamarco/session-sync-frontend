@@ -24,6 +24,7 @@ Repo layout: `frontend/` (this Next.js app), `backend/` (empty so far). The pare
 - Import alias: `@/*` maps to `src/*`.
 - Global client state: Redux Toolkit (`@reduxjs/toolkit`) with `react-redux`. See "State management" below.
 - Icons: `lucide-react`. Import icons by name (`import { Menu, User } from "lucide-react"`), size via the `size` prop, colour via Tailwind `text-*` classes. Do not add another icon library.
+- Dates: `dayjs` for date maths and formatting. Calendar UI: `react-day-picker` (v10), used **unstyled** and styled entirely through its `classNames` prop with theme tokens; do not import its `style.css`.
 - Tailwind v4 is configured in CSS (no `tailwind.config.*`). Use v4 syntax, e.g. `bg-linear-to-br` rather than `bg-gradient-to-br`.
 - Fonts: Geist is loaded in `src/app/layout.tsx`, but typography is **deliberately undecided**; do not introduce custom fonts or a type scale until agreed.
 
@@ -59,7 +60,22 @@ Rules:
 - `src/components/classes/ClassCard.tsx`: full-width horizontal card (stacks on mobile). Left: placeholder instructor avatar (same lucide `User` in a `bg-foreground/10` circle as the navbar), then title above subtitle. Right (`sm:w-1/5`): primary "Book" link to `/classes/[id]/book` with a text-style "+ details" button below it.
 - `src/components/classes/ClassDetailsButton.tsx`: Client Component holding the "+ details" button and a native `<dialog>` (right-hand drawer below `sm`, centred modal from `sm` up). The details content is a placeholder.
 - `src/app/classes/[id]/book/page.tsx`: `/classes/[id]/book` route; only renders `<Booking />`. It does not read `params` yet. In Next 16 `params` is a Promise, so type it with `PageProps<"/classes/[id]/book">` and `await params` once it is needed.
-- `src/components/classes/Booking.tsx`: booking page **placeholder**. A "Back to classes" link (lucide `ArrowLeft`) to `/classes` and `<h1>Booking</h1>`. The booking UI has not been built yet.
+- `src/components/classes/Booking.tsx`: booking page (Server Component). A "Back to classes" link (lucide `ArrowLeft`) to `/classes`, `<h1>Booking</h1>`, then a three-step accordion built from a hoisted `steps` array: "Choose date & time", "Payment", "Confirmation". For now step 1 is always open and steps 2 and 3 are always disabled. Step progression is not implemented.
+- `src/components/booking/BookingStep.tsx`: one accordion section (`step`, `title`, `isOpen`, `isDisabled`, `children`). It has a numbered circle and title header, and renders the body only when open. Disabled steps are dimmed (`opacity-50`). The header is not clickable yet; when progression is added, make it a `<button aria-expanded>` and set `disabled` on that button for locked steps (`aria-disabled` is not valid on `<section>`).
+- `src/components/booking/ChooseDateTime.tsx`: content of step 1. A Client Component that loads `Calendar` via `next/dynamic` with `ssr: false` and a skeleton placeholder. The calendar is client-only on purpose: "today" depends on the user's timezone, so server (UTC) prerendering could mismatch on hydration. Next 16 only allows `ssr: false` inside Client Components.
+- `src/components/calendar/`: reusable date and time-slot picker, ported from an earlier app.
+  - `Calendar.tsx` (client) composes the parts and holds the react-day-picker `classNames` map.
+    - Layout: one borderless panel, with the month on the left and the times on the right, split by a divider. It stacks below `md`.
+    - Before a day is picked, the right side shows an empty state ("Pick a day to see available times.").
+    - Month header: the caption is on the left and the arrows are grouped on the right (the default nav, absolutely positioned).
+    - Day styling: today gets a primary ring, the selected day is filled, and every control has a primary `focus-visible` outline. Day state is styled through the cell's `data-selected`, `data-disabled` and `data-today` attributes. The prev/next buttons use `aria-disabled`, not `disabled`.
+    - Size: cells are 40px below `sm` and 44px from `sm` up, so the month fits at 375px.
+    - Motion: the times panel is keyed by date and fades in through `starting:` (`@starting-style`), only with `motion-safe`.
+  - `CalendarMonth.tsx` wraps `DayPicker`.
+  - `CalendarSlots.tsx` shows the date heading and the user's timezone (from `Intl`; safe because the calendar is client-only). The slots are grouped into "Morning" and "Afternoon". Its optional `bookedSlots` prop is reserved for backend availability.
+  - `useCalendar.ts` holds the selected date and slot state and accepts an `onSelectTimeSlot(date, slot)` callback.
+  - `utils.ts` provides `getDateRange` (today to +6 months, computed per call), `isWeekend`, `getTimeSlots` (mock 9:00 to 17:00, 30-minute steps) and `getDateKey`.
+  - Weekends and dates outside the range are disabled. Availability is **mock**.
 - The landing page is a **placeholder**; the final design has not been agreed. Copy not taken from the deck (hero headline, "how it works" steps, "Maria Lopez" mock card) is our own wording.
 
 ## State management (Redux Toolkit)
@@ -69,6 +85,7 @@ Rules:
 - `src/app/StoreProvider.tsx`: Client Component that creates the store once (lazy `useState`) and renders `<Provider>`. Wraps the navbar and page content in the root layout.
 - Features: one folder per feature, `src/lib/features/<name>/<name>Slice.ts`, built with `createSlice`. Name actions as past-tense events (`loggedIn`, `loggedOut`), declare selectors in the slice's `selectors` field, export actions and selectors by name and the reducer as default.
 - Current slices: `auth` (`isLoggedIn`, `user`; mock, initial state logged out).
+- **Planned: `booking` slice.** It will save the selected date and time slot so that the booking steps (payment, confirmation) can read them. Store the date as a `YYYY-MM-DD` string (`getDateKey`), not a `Date`, because Redux state must be serializable. Until then the selection lives in local state in `useCalendar`. The dispatch goes in the `onSelectTimeSlot` callback passed to `Calendar` from `ChooseDateTime`, which is also where opening the Payment step will be triggered.
 - Only Client Components can read or dispatch to the store. Server Components fetch their data directly; put data in Redux only when it is client state shared across components. When the backend exists, consider RTK Query for server data rather than hand-written thunks.
 
 ## Conventions
@@ -79,7 +96,7 @@ Rules:
 - Keep components mobile-first and responsive (check ~375px width; no horizontal page scroll; wide tables scroll inside an `overflow-x-auto` wrapper). Support light and dark mode through the theme tokens.
 - Match the surrounding code style (double quotes, semicolons, 2-space indent, Tailwind classes inline, no CSS modules).
 - Follow the performance rules in `.agents/skills/vercel-react-best-practices/` (see its `SKILL.md`), e.g. avoid barrel-file imports, hoist static JSX/data, fetch in parallel on the server.
-- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, the booking flow and class details content, real authentication (the auth slice is a mock with no way to log in yet), the backend, tests.
+- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, the `booking` Redux slice, booking step progression, the Payment and Confirmation steps, real availability and booked slots, class details content, real authentication (the auth slice is a mock with no way to log in yet), the backend, tests.
 
 ## Commands (run from `frontend/`)
 
