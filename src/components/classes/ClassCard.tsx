@@ -1,12 +1,14 @@
+import Link from "next/link";
 import { User } from "lucide-react";
 import ClassDetailsButton from "@/components/classes/ClassDetailsButton";
 
 type ClassCardProps = {
+  id: string;
   title: string;
   subtitle: string;
 };
 
-export default function ClassCard({ title, subtitle }: ClassCardProps) {
+export default function ClassCard({ id, title, subtitle }: ClassCardProps) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background p-6 transition hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10 sm:flex-row sm:items-center">
       <span
@@ -20,12 +22,12 @@ export default function ClassCard({ title, subtitle }: ClassCardProps) {
         <p className="mt-1 text-sm text-muted">{subtitle}</p>
       </div>
       <div className="flex flex-col items-stretch gap-2 sm:w-1/5">
-        <button
-          type="button"
-          className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+        <Link
+          href={`/classes/${id}/book`}
+          className="rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground transition hover:opacity-90"
         >
           Book
-        </button>
+        </Link>
         <ClassDetailsButton title={title} subtitle={subtitle} />
       </div>
     </div>

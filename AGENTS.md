@@ -55,8 +55,11 @@ Rules:
 - `src/components/Navbar.tsx`: sticky top bar with three sections. Left: logo placeholder text "my logo" (real logo TBD). Centre: Dashboard (`/dashboard`) and Classes (`/classes`). Right: lucide `User` avatar plus "Login / Register" (`/login`) or "Logout". Reads `selectIsLoggedIn` from the Redux auth slice (**mock only, no real auth yet**); Logout dispatches `loggedOut()`. Below the `md` breakpoint the centre links collapse into a hamburger menu. It is a Client Component because of the menu `useState` and the Redux hooks.
 - `src/components/landing/*.tsx`: one file per landing section, so the layout is easy to reorder or replace. Content (copy, plans, rows) sits in hoisted module-level constant arrays at the top of each file. `#features` and `#pricing` are anchor ids with `scroll-mt-16` to clear the sticky navbar.
 - `src/app/classes/page.tsx`: `/classes` route; only renders `<Classes />`.
-- `src/components/classes/Classes.tsx`: classes page content. `<h1>Classes</h1>` plus a single-column list of `ClassCard`s built from a hoisted **mock** `classes` array (title, subtitle). The container uses `mx-auto w-full max-w-7xl px-4 sm:px-6` so it lines up with the navbar; `w-full` is required because the body is a flex column and `mx-auto` alone would shrink the container to its content.
-- `src/components/classes/ClassCard.tsx`: full-width horizontal card (stacks on mobile). Left: placeholder instructor avatar (same lucide `User` in a `bg-foreground/10` circle as the navbar), then title above subtitle. Right (`sm:w-1/5`): primary "Book" button with a text-style "+ details" button below it. Both buttons are **inert** (no booking/details routes or backend yet).
+- `src/components/classes/Classes.tsx`: classes page content. A single-column list of `ClassCard`s built from a hoisted **mock** `classes` array (id, title, subtitle). The container uses `mx-auto w-full max-w-7xl px-4 sm:px-6` so it lines up with the navbar; `w-full` is required because the body is a flex column and `mx-auto` alone would shrink the container to its content.
+- `src/components/classes/ClassCard.tsx`: full-width horizontal card (stacks on mobile). Left: placeholder instructor avatar (same lucide `User` in a `bg-foreground/10` circle as the navbar), then title above subtitle. Right (`sm:w-1/5`): primary "Book" link to `/classes/[id]/book` with a text-style "+ details" button below it.
+- `src/components/classes/ClassDetailsButton.tsx`: Client Component holding the "+ details" button and a native `<dialog>` (right-hand drawer below `sm`, centred modal from `sm` up). The details content is a placeholder.
+- `src/app/classes/[id]/book/page.tsx`: `/classes/[id]/book` route; only renders `<Booking />`. It does not read `params` yet. In Next 16 `params` is a Promise, so type it with `PageProps<"/classes/[id]/book">` and `await params` once it is needed.
+- `src/components/classes/Booking.tsx`: booking page **placeholder**. A "Back to classes" link (lucide `ArrowLeft`) to `/classes` and `<h1>Booking</h1>`. The booking UI has not been built yet.
 - The landing page is a **placeholder**; the final design has not been agreed. Copy not taken from the deck (hero headline, "how it works" steps, "Maria Lopez" mock card) is our own wording.
 
 ## State management (Redux Toolkit)
@@ -76,7 +79,7 @@ Rules:
 - Keep components mobile-first and responsive (check ~375px width; no horizontal page scroll; wide tables scroll inside an `overflow-x-auto` wrapper). Support light and dark mode through the theme tokens.
 - Match the surrounding code style (double quotes, semicolons, 2-space indent, Tailwind classes inline, no CSS modules).
 - Follow the performance rules in `.agents/skills/vercel-react-best-practices/` (see its `SKILL.md`), e.g. avoid barrel-file imports, hoist static JSX/data, fetch in parallel on the server.
-- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, booking and class details, real authentication (the auth slice is a mock with no way to log in yet), the backend, tests.
+- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, the booking flow and class details content, real authentication (the auth slice is a mock with no way to log in yet), the backend, tests.
 
 ## Commands (run from `frontend/`)
 
