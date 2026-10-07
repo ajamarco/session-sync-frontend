@@ -22,6 +22,7 @@ Repo layout: `frontend/` (this Next.js app), `backend/` (empty so far). The pare
 
 - Next.js 16 (App Router, `src/` dir), React 19, TypeScript, Tailwind CSS v4, ESLint, npm.
 - Import alias: `@/*` maps to `src/*`.
+- Global client state: Redux Toolkit (`@reduxjs/toolkit`) with `react-redux`. See "State management" below.
 - Icons: `lucide-react`. Import icons by name (`import { Menu, User } from "lucide-react"`), size via the `size` prop, colour via Tailwind `text-*` classes. Do not add another icon library.
 - Tailwind v4 is configured in CSS (no `tailwind.config.*`). Use v4 syntax, e.g. `bg-linear-to-br` rather than `bg-gradient-to-br`.
 - Fonts: Geist is loaded in `src/app/layout.tsx`, but typography is **deliberately undecided**; do not introduce custom fonts or a type scale until agreed.
@@ -49,24 +50,33 @@ Rules:
 
 ## Code structure
 
-- `src/app/layout.tsx`: root layout, renders `<Navbar />` above `{children}`. Metadata title is "SessionSync".
+- `src/app/layout.tsx`: root layout, renders `<Navbar />` above `{children}`, both inside `<StoreProvider>`. Metadata title is "SessionSync".
 - `src/app/page.tsx`: landing page; only composes section components in order (Hero, Problem, Features, HowItWorks, Audience, Pricing, Comparison, CallToAction) followed by `Footer`.
-- `src/components/Navbar.tsx`: sticky top bar with three sections. Left: logo placeholder text "my logo" (real logo TBD). Centre: Dashboard (`/dashboard`) and Classes (`/classes`). Right: lucide `User` avatar plus "Login / Register" (`/login`) or "Logout". Takes an `isLoggedIn` prop (default `false`, **mock only, no real auth yet**; Logout does nothing). Below the `md` breakpoint the centre links collapse into a hamburger menu. It is a Client Component only because of the menu `useState`.
+- `src/components/Navbar.tsx`: sticky top bar with three sections. Left: logo placeholder text "my logo" (real logo TBD). Centre: Dashboard (`/dashboard`) and Classes (`/classes`). Right: lucide `User` avatar plus "Login / Register" (`/login`) or "Logout". Reads `selectIsLoggedIn` from the Redux auth slice (**mock only, no real auth yet**); Logout dispatches `loggedOut()`. Below the `md` breakpoint the centre links collapse into a hamburger menu. It is a Client Component because of the menu `useState` and the Redux hooks.
 - `src/components/landing/*.tsx`: one file per landing section, so the layout is easy to reorder or replace. Content (copy, plans, rows) sits in hoisted module-level constant arrays at the top of each file. `#features` and `#pricing` are anchor ids with `scroll-mt-16` to clear the sticky navbar.
 - `src/app/classes/page.tsx`: `/classes` route; only renders `<Classes />`.
 - `src/components/classes/Classes.tsx`: classes page content. `<h1>Classes</h1>` plus a single-column list of `ClassCard`s built from a hoisted **mock** `classes` array (title, subtitle). The container uses `mx-auto w-full max-w-7xl px-4 sm:px-6` so it lines up with the navbar; `w-full` is required because the body is a flex column and `mx-auto` alone would shrink the container to its content.
 - `src/components/classes/ClassCard.tsx`: full-width horizontal card (stacks on mobile). Left: placeholder instructor avatar (same lucide `User` in a `bg-foreground/10` circle as the navbar), then title above subtitle. Right (`sm:w-1/5`): primary "Book" button with a text-style "+ details" button below it. Both buttons are **inert** (no booking/details routes or backend yet).
 - The landing page is a **placeholder**; the final design has not been agreed. Copy not taken from the deck (hero headline, "how it works" steps, "Maria Lopez" mock card) is our own wording.
 
+## State management (Redux Toolkit)
+
+- `src/lib/store.ts`: `makeStore()` factory (not a module-level singleton, so server requests never share state) plus the `AppStore`, `RootState` and `AppDispatch` types. Register every feature reducer in its `reducer` map.
+- `src/lib/hooks.ts`: typed `useAppDispatch`, `useAppSelector`, `useAppStore`. Always use these, never the plain react-redux hooks.
+- `src/app/StoreProvider.tsx`: Client Component that creates the store once (lazy `useState`) and renders `<Provider>`. Wraps the navbar and page content in the root layout.
+- Features: one folder per feature, `src/lib/features/<name>/<name>Slice.ts`, built with `createSlice`. Name actions as past-tense events (`loggedIn`, `loggedOut`), declare selectors in the slice's `selectors` field, export actions and selectors by name and the reducer as default.
+- Current slices: `auth` (`isLoggedIn`, `user`; mock, initial state logged out).
+- Only Client Components can read or dispatch to the store. Server Components fetch their data directly; put data in Redux only when it is client state shared across components. When the backend exists, consider RTK Query for server data rather than hand-written thunks.
+
 ## Conventions
 
 - Default to **Server Components**. Add `"use client"` only where state, effects or browser APIs are needed, and keep that boundary as small as possible.
-- Declare React components as **arrow-function constants**, not with the `function` keyword: `const Navbar = ({ isLoggedIn = false }: NavbarProps) => { ... };` followed by `export default Navbar;`. This applies to all new components, including pages and layouts (`const Page = () => ...; export default Page;`). Existing `function` components are not being refactored; convert one only when you are already editing it substantially.
+- Declare React components as **arrow-function constants**, not with the `function` keyword: `const ClassCard = ({ title, subtitle }: ClassCardProps) => { ... };` followed by `export default Navbar;`. This applies to all new components, including pages and layouts (`const Page = () => ...; export default Page;`). Existing `function` components are not being refactored; convert one only when you are already editing it substantially.
 - Use `next/link` for internal navigation; plain `<a>` only for anchors and `mailto:`.
 - Keep components mobile-first and responsive (check ~375px width; no horizontal page scroll; wide tables scroll inside an `overflow-x-auto` wrapper). Support light and dark mode through the theme tokens.
 - Match the surrounding code style (double quotes, semicolons, 2-space indent, Tailwind classes inline, no CSS modules).
 - Follow the performance rules in `.agents/skills/vercel-react-best-practices/` (see its `SKILL.md`), e.g. avoid barrel-file imports, hoist static JSX/data, fetch in parallel on the server.
-- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, booking and class details, authentication, the backend, tests.
+- Not built yet: `/login` and `/dashboard` routes (links to them 404), real class data, booking and class details, real authentication (the auth slice is a mock with no way to log in yet), the backend, tests.
 
 ## Commands (run from `frontend/`)
 

@@ -3,18 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, User, X } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { loggedOut, selectIsLoggedIn } from "@/lib/features/auth/authSlice";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/classes", label: "Classes" },
 ];
 
-type NavbarProps = {
-  isLoggedIn?: boolean;
-};
-
-export default function Navbar({ isLoggedIn = false }: NavbarProps) {
+export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const dispatch = useAppDispatch();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
@@ -61,6 +61,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
           {isLoggedIn ? (
             <button
               type="button"
+              onClick={() => dispatch(loggedOut())}
               className="rounded-md border border-foreground/20 px-3 py-1.5 text-sm font-medium hover:bg-foreground/10"
             >
               Logout
